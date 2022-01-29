@@ -63,9 +63,12 @@
 
         mov bx, 0
 
-        LOOP_READ_NUMBER:
         cmp al, SPACE
-        je REMOVE_SPACES
+        jne REMOVED_SPACES
+        call read_blank
+        REMOVED_SPACES:
+
+        LOOP_READ_NUMBER:
         al_to_int END_LOOP_READ_NUMBER        
         push ax
 
@@ -88,8 +91,6 @@
 
         call read_char
         jmp LOOP_READ_NUMBER
-        REMOVE_SPACES:
-        call read_blank
         END_LOOP_READ_NUMBER:
 
         mov dx, bx
@@ -218,6 +219,7 @@
         ; welcome message
         lea dx, welcome_message
         call puts
+
 
         ; calculate
         call read_blank
@@ -472,27 +474,8 @@
 
                 ; check if the number is too big
                 ; (result should be 16 bits)
-
                 CMP     DX, 0
                 JNZ     too_big
-                ;;;;;;;;;;;;;;;;; CHECKING FOR TOO BIG
-                PUSH AX
-                PUSH CX
-                PUSH DX
-                PUSH BX
-                MOV AX, CX
-                MOV CX, BX
-                    CHECK_TOO_BIG_1:
-                    IMUL ten
-                    CMP DX, 0
-                    JNZ too_big
-                    LOOP CHECK_TOO_BIG_1
-                POP BX            
-                POP DX
-                POP CX
-                POP AX            
-                ;;;;;;;;;;;;;;;;;            
-
                 ; convert from ASCII code:
                 SUB     AL, 30h
 
@@ -501,23 +484,6 @@
                 MOV     DX, CX      ; backup, in case the result will be too big.
                 ADD     CX, AX
                 JC      too_big2    ; jump if the number is too big.
-                ;;;;;;;;;;;;;;;;; CHECKING FOR TOO BIG
-                PUSH AX
-                PUSH CX
-                PUSH DX
-                PUSH BX
-                MOV AX, CX
-                MOV CX, BX
-                    CHECK_TOO_BIG_2:
-                    IMUL ten
-                    CMP DX, 0
-                    JNZ too_big2
-                    LOOP CHECK_TOO_BIG_2
-                POP BX            
-                POP DX
-                POP CX
-                POP AX            
-                ;;;;;;;;;;;;;;;;;
                 JMP     f_next_digit
 
         set_minus:
@@ -548,12 +514,15 @@
                 ; check flag:
                 
                 ;;;;;;;;;;;;;;;;; MULTIPLYING BY POWER OF 10
+                cmp bx, 0
+                je END_PRODUCE_RESULT                
                 MOV AX, CX
                 MOV CX, BX
                     PRODUCE_RESULT:
                     IMUL ten
                     LOOP PRODUCE_RESULT
                 MOV CX, AX
+                END_PRODUCE_RESULT:
                 ;;;;;;;;;;;;;;;;;
 
 
