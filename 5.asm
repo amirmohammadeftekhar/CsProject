@@ -8,7 +8,7 @@
     Rsize DB ?
     inStr DB 100 DUP(0)
 
-    _a DW 1
+    _a DW 0
     _b DW 1
 
 .STACK
@@ -119,12 +119,11 @@ ENDM
         func_intro
         mov	ax,4[bp]
         test	ax,ax
-        jne 	fact_if1
-        fact_if2:
+        jne 	continue_fact
         mov	ax,1
         func_outro
         ret
-        fact_if1:
+        continue_fact:
         mov	ax,4[bp]
         dec	ax
         push	ax
@@ -140,15 +139,14 @@ ENDM
     cal_fib PROC
         func_intro
         mov	ax,4[bp]
-        cmp	ax,*1
-        jg  	fib_if1
-        fib_if2:
+        cmp	ax,1
+        jg  	continue_fib
         mov	ax,[_b]
         func_outro
         ret
-        fib_if1:
-        jmp fib_if4
-        fib_if5:
+        continue_fib:
+        jmp check_1_fib
+        body_fib:
         mov	ax,[_b]
         add	ax,[_a]
         mov	[_b],ax
@@ -158,11 +156,10 @@ ENDM
         mov	ax,4[bp]
         dec	ax
         mov	4[bp],ax
-        fib_if4:
+        check_1_fib:
         mov	ax,4[bp]
-        cmp	ax,*1
-        jg 	fib_if5
-        fib_if3:
+        cmp	ax,1
+        jg 	body_fib
         mov	ax,[_b]
         func_outro
         ret
@@ -190,8 +187,8 @@ ENDM
         push bx
         mov bx,ax
         call cal_fib
-        add ax, bx
-        push ax
+        sub bx,ax
+        push bx
         call output_num
 
 
