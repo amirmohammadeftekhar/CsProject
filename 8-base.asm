@@ -442,10 +442,6 @@
             mov     make_minus, 1
             jmp     f_next_digit
 
-    f_out_of_range:
-            lea     dx, EXIT_BIG_NUMBER
-            call    puts
-
     f_stop_input:
             ; check flag:
             cmp     make_minus, 0
