@@ -27,6 +27,7 @@ func_intro MACRO
         push	bp
         push cx
         push bx
+        push dx
         push di
         push si
         mov	bp,sp
@@ -34,6 +35,7 @@ ENDM
 func_outro MACRO
         pop	si
         pop	di
+        pop dx
         pop bx
         pop cx
         pop	bp
@@ -53,6 +55,7 @@ ENDM
 
     get_a_index PROC
         func_intro
+        push ax
         mov ax,[_i]
         mov cx,[_2n]
         mul cx
@@ -60,20 +63,23 @@ ENDM
         mov cx,-2
         mul cx
         mov [_sia],ax
+        pop ax
         func_outro
         ret
     get_a_index ENDP
 
     get_b_index PROC
         func_intro
+        push ax
         mov ax,[_i]
         mov cx,[_2n]
         mul cx
         add ax,[_j]
-        add ax,[_n2]
+        add ax,[_2n2]
         mov cx,-2
         mul cx
         mov [_sib],ax
+        pop ax
         func_outro
         ret
     get_b_index ENDP
@@ -117,6 +123,7 @@ ENDM
         jl loop_i
 
 
+
         chunk1:
         mov [_i],0
 
@@ -128,6 +135,7 @@ ENDM
         cmp ax,[_i]
         je continue_c1
         add ax,[_n]
+        mov [_j],ax
         call get_a_index
         mov dx,[_sia]
         mov si,dx
@@ -141,6 +149,7 @@ ENDM
         add [_i],1
         cmp [_i],ax
         jl loop_i_c1
+
 
         chunk2:
         mov [_ii],0
@@ -174,6 +183,8 @@ ENDM
         mov dx,[_sia]
         mov si,dx
         mov ax,word ptr -2[bp][si]  ; ax = a[j][i]
+
+
         mov [_i],bx
         mov [_j],bx
         call get_b_index
@@ -183,24 +194,34 @@ ENDM
         mul dx                       ; ax = a[j][i] * b[i][i]
         mov [_ratioa],ax
 
+        mov ax,[_ratioa]
+
+
         mov [_i],bx
         mov [_j],bx
         call get_a_index
         mov dx,[_sia]
         mov si,dx
         mov ax,word ptr -2[bp][si]   ; ax = a[i][i]
+
         mov [_i],cx
         mov [_j],bx
         call get_b_index
         mov dx,[_sib]
         mov si,dx
         mov dx,word ptr -2[bp][si]  ; dx = b[j][i]
+
         mul dx                      ; ax = a[i][i] * b[j][i]
         mov [_ratiob],ax
+
 
         mov [_kk],0
 
         loop_kk_c2:
+
+
+
+
         mov [_i],bx
         mov ax,[_kk]
         mov [_j],ax
@@ -218,6 +239,7 @@ ENDM
         mul dx                      ; ax = a[i][k] * b[j][k]
         mov dx,[_ratioa]
         mul dx                      ; ax = a[i][k] * b[j][k] * ratioa
+
 
         push ax
 
@@ -242,15 +264,16 @@ ENDM
 
         pop dx
         sub ax,dx                   ; ax = a[j][k]*ratiob*b[i][k] - ratioa*a[i][k]*b[j][k];
-        push ax
         mov [_i],cx
         mov dx,[_kk]
         mov [_j],dx
         call get_a_index
         mov dx,[_sia]
         mov si,dx
-        pop ax
-        mov -2[bp][si],ax         ; a[j][j] = ...
+        mov -2[bp][si],ax         ; a[j][k] = ...
+
+
+
 
         mov [_i],cx
         mov ax,[_kk]
@@ -259,6 +282,7 @@ ENDM
         mov dx,[_sib]
         mov si,dx
         mov ax,word ptr -2[bp][si]  ; ax = b[j][k]
+
         mov [_i],bx
         mov ax,[_kk]
         mov [_j],ax
@@ -269,25 +293,26 @@ ENDM
         mul dx                      ; ax = b[j][k] * b[i][k]
         mov dx,[_ratiob]
         mul dx                      ; ax = b[j][k] * b[i][k] * ratiob
-        push ax
         mov [_i],cx
         mov dx,[_kk]
         mov [_j],dx
         call get_b_index
         mov dx,[_sib]
         mov si,dx
-        pop ax
         mov -2[bp][si],ax           ; b[j][k] = ....
 
-        continue_c2:
+
+
         add [_kk],1
         mov ax,[_2n]
         cmp [_kk],ax
         jl loop_kk_c2
+        continue_c2:
         add [_jj],1
         mov ax,[_n]
         cmp [_jj],ax
         jl loop_jj_c2
+
         add [_ii],1
         mov ax,[_n]
         cmp [_ii],ax
@@ -334,6 +359,15 @@ ENDM
         mov ax,word ptr -2[bp][si]  ; ax = b[i][j]
         mul dx
         mov -2[bp][si],ax           ; b[i][j] = ...
+        add [_jj],1
+        mov ax,[_2n]
+        cmp [_jj],ax
+        jl loop_jj_c3
+        add [_ii],1
+        mov ax,[_n]
+        cmp [_ii],ax
+        jl loop_ii_c3
+
 
 
 
@@ -343,7 +377,11 @@ ENDM
 
 
         print_matrix:
-        mov cx,[_2n2]
+        printn ''
+        mov ax,[_2n2]
+        mov cx,2
+        mul cx
+        mov cx,ax
         mov dx,0
         mov si,dx
         loop_print_matrix:
@@ -353,6 +391,10 @@ ENDM
         call print_num
         sub si,2
         loop loop_print_matrix
+
+
+
+
 
         delete_matrix:
         mov ax,[_2n2]
