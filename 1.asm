@@ -222,16 +222,17 @@ ENDM
 
 
 
+
         mov [_i],bx
-        mov ax,[_kk]
-        mov [_j],ax
+        mov dx,[_kk]
+        mov [_j],dx
         call get_a_index
         mov dx,[_sia]
         mov si,dx
         mov ax,word ptr -2[bp][si]  ; ax = a[i][k]
         mov [_i],cx
-        mov ax,[_kk]
-        mov [_j],ax
+        mov dx,[_kk]
+        mov [_j],dx
         call get_b_index
         mov dx,[_sib]
         mov si,dx
@@ -241,12 +242,13 @@ ENDM
         mul dx                      ; ax = a[i][k] * b[j][k] * ratioa
 
 
+
         push ax
 
 
         mov [_i],cx
-        mov ax,[_kk]
-        mov [_j],ax
+        mov dx,[_kk]
+        mov [_j],dx
         call get_a_index
         mov dx,[_sia]
         mov si,dx
@@ -254,8 +256,8 @@ ENDM
         mov dx,[_ratiob]
         mul dx                      ; ax = a[j][k] * ratiob
         mov [_i],bx
-        mov ax,[_kk]
-        mov [_j],ax
+        mov dx,[_kk]
+        mov [_j],dx
         call get_b_index
         mov dx,[_sib]
         mov si,dx
@@ -264,6 +266,7 @@ ENDM
 
         pop dx
         sub ax,dx                   ; ax = a[j][k]*ratiob*b[i][k] - ratioa*a[i][k]*b[j][k];
+
         mov [_i],cx
         mov dx,[_kk]
         mov [_j],dx
@@ -276,23 +279,28 @@ ENDM
 
 
         mov [_i],cx
-        mov ax,[_kk]
-        mov [_j],ax
+        mov dx,[_kk]
+        mov [_j],dx
         call get_b_index
         mov dx,[_sib]
         mov si,dx
         mov ax,word ptr -2[bp][si]  ; ax = b[j][k]
 
         mov [_i],bx
-        mov ax,[_kk]
-        mov [_j],ax
+        mov dx,[_kk]
+        mov [_j],dx
         call get_b_index
         mov dx,[_sib]
         mov si,dx
         mov dx,word ptr -2[bp][si]  ; dx = b[i][k]
+
         mul dx                      ; ax = b[j][k] * b[i][k]
         mov dx,[_ratiob]
+
+
         mul dx                      ; ax = b[j][k] * b[i][k] * ratiob
+
+
         mov [_i],cx
         mov dx,[_kk]
         mov [_j],dx
@@ -300,6 +308,8 @@ ENDM
         mov dx,[_sib]
         mov si,dx
         mov -2[bp][si],ax           ; b[j][k] = ....
+
+
 
 
 
@@ -317,6 +327,7 @@ ENDM
         mov ax,[_n]
         cmp [_ii],ax
         jl loop_ii_c2
+
 
         chunk3:
 
@@ -391,6 +402,8 @@ ENDM
         call print_num
         sub si,2
         loop loop_print_matrix
+
+
 
 
 
