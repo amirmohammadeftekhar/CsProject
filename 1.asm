@@ -345,6 +345,7 @@ ENDM
         mov dx,[_sib]
         mov si,dx
         mov dx,word ptr -2[bp][si]  ; dx = b[i][i]
+        push dx
 
         mov [_i],bx
         mov [_j],cx
@@ -352,6 +353,7 @@ ENDM
         mov dx,[_sia]
         mov si,dx
         mov ax,word ptr -2[bp][si]  ; ax = a[i][j]
+        pop dx
         mul dx
         mov -2[bp][si],ax           ; a[i][j] = ...
 
@@ -361,6 +363,7 @@ ENDM
         mov dx,[_sia]
         mov si,dx
         mov dx,word ptr -2[bp][si]  ; dx = a[i][i]
+        push dx
 
         mov [_i],bx
         mov [_j],cx
@@ -368,6 +371,7 @@ ENDM
         mov dx,[_sib]
         mov si,dx
         mov ax,word ptr -2[bp][si]  ; ax = b[i][j]
+        pop dx
         mul dx
         mov -2[bp][si],ax           ; b[i][j] = ...
         add [_jj],1
