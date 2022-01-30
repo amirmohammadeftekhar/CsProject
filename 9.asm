@@ -1,4 +1,8 @@
 .MODEL SMALL
+.MODEL SMALL
+
+include 'emu8086.inc'
+
 
 .DATA
     CR EQU 13
@@ -31,92 +35,6 @@ ENDM
 
 .CODE
 
-    input PROC
-        func_intro
-        lea dx,inBuf
-        mov ah,0AH
-        int 21h
-        lea bx,inStr
-        mov cl,Rsize
-        sub ch,ch
-        mov si,cx
-        mov byte ptr[bx+si],'$'
-        func_outro
-        ret
-    input ENDP
-
-    new_line PROC
-        func_intro
-        mov dl,CR
-        mov ah,02
-        int 21h
-        mov dl,LF
-        mov ah,02
-        int 21H
-        func_outro
-        ret
-    new_line ENDP
-
-    output PROC
-        func_intro
-        call new_line
-        lea dx,si
-        mov ah,09
-        int 21h
-        func_outro
-        ret
-
-
-
-    input_num PROC
-        func_intro
-        xor bx,bx
-        loop:
-        lodsb
-        cmp al,'0'
-        jb noascii
-        cmp al,'9'
-        ja noascii
-        sub al,30h
-        cbw
-        push ax
-        mov ax,bx
-        mov cx,10
-        mul cx
-        mov bx,ax
-        pop ax
-        add bx,ax
-        jmp loop
-        noascii:
-        func_outro
-        ret
-
-    input_num ENDP
-
-    output_num PROC
-        func_intro
-        call new_line
-        mov cx, 0
-        mov bx, 10
-        mov	ax,4[bp]
-        loophere:
-        mov dx, 0
-        div bx
-        push ax
-        add dl, '0'
-        pop ax
-        push dx
-        inc cx
-        cmp ax, 0
-        jnz loophere
-        mov ah, 2
-        loophere2:
-        pop dx
-        int 21h
-        loop loophere2
-        func_outro
-        ret
-    output_num ENDP
 
 
 
@@ -127,8 +45,8 @@ ENDM
         mov	ax,4[bp]
         inc	ax
         mov	-6[bp],ax
-        jmp .3
-        .4:
+        jmp loop_condition_1
+        preprocess:
         mov	bx,4[bp]
         shl	bx,1
         mov	si,-6[bp]
@@ -141,43 +59,41 @@ ENDM
         mov	[_tmp2],ax
         mov	ax,[_tmp1]
         test	ax,ax
-        jg .5
-        .6:
+        jg first_condition_check
+        make_positive:
         mov	ax,[_tmp1]
         mov	cx,-1
         imul	cx
         mov	[_tmp1],ax
-        .5:
+        first_condition_check:
         mov	ax,[_tmp1]
         test	ax,ax
-        jne .7
-        .8:
+        jne second_condition_check
         inc	sp
         inc	sp
         func_outro
         ret
-        .7:
+        second_condition_check:
         mov	ax,[_tmp1]
         cmp	ax,[_tmp2]
-        jne .9
-        .A:
+        jne i_update_1
         inc	sp
         inc	sp
         func_outro
         ret
-        .9:
+        i_update_1:
         mov	ax,-6[bp]
         inc	ax
         mov	-6[bp],ax
-        .3:
+        loop_condition_1:
         mov	ax,-6[bp]
         cmp	ax,[_n]
-        jl .4
-        .1:
+        jl preprocess
+        check_t_is_0:
         mov	ax,4[bp]
         test	ax,ax
-        jne .C
-        .D:
+        jne calling_functions
+        catching_a_result:
         mov	ax,[_rt]
         inc	ax
         mov	[_rt],ax
@@ -185,11 +101,11 @@ ENDM
         inc	sp
         func_outro
         ret
-        .C:
+        calling_functions:
         xor	ax,ax
         mov	-6[bp],ax
-        jmp .10
-        .11:
+        jmp loop_condition_2
+        body_loop_2:
         mov	ax,4[bp]
         dec	ax
         shl	ax,1
@@ -202,15 +118,14 @@ ENDM
         call	_solve
         inc	sp
         inc	sp
-        .F:
+        i_update_2:
         mov	ax,-6[bp]
         inc	ax
         mov	-6[bp],ax
-        .10:
+        loop_condition_2:
         mov	ax,-6[bp]
         cmp	ax,[_n]
-        jl .11
-        .E:
+        jl body_loop_2
         inc	sp
         inc	sp
         func_outro
@@ -234,10 +149,16 @@ ENDM
         lea sp,stack_array + 200h
         push bp
 
+        call scan_num
+        mov al, cl
+        cbw
+        mov [_n],ax
+
         push [_n]
         call _solve
-        push [_rt]
-        call output_num
+
+        mov ax,[_rt]
+        call print_num
 
 
 
@@ -248,6 +169,12 @@ ENDM
 
     MAIN ENDP
 
+    DEFINE_SCAN_NUM
+    DEFINE_PRINT_NUM
+
+    DEFINE_PRINT_NUM_UNS
+    DEFINE_CLEAR_SCREEN
+
+
 
 END MAIN
-
