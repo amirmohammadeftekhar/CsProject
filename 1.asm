@@ -1,6 +1,7 @@
 include 'emu8086.inc'
 .MODEL SMALL
 
+precision = 30
 
 .DATA
     _n dw ?
@@ -18,6 +19,7 @@ include 'emu8086.inc'
     _sia dw ?
     _sib dw ?
     _m1 dw ?
+    ten             dw      10
 
 
 .STACK
@@ -43,6 +45,107 @@ ENDM
 
 
 .CODE
+
+print_fraction  proc    near
+        push    ax
+        push    dx
+next_fraction:
+        ; check if all digits are already printed:
+        cmp     cx, 0
+        jz      end_rem
+        dec     cx      ; decrease digit counter.
+
+        ; when remainder is '0' no need to continue:
+        cmp     dx, 0
+        je      end_rem
+
+        mov     ax, dx
+        xor     dx, dx
+        cmp     ax, 0
+        jns     not_sig1
+        not     dx
+not_sig1:
+
+        imul    ten             ; dx:ax = ax * 10
+
+        idiv    bx              ; ax = dx:ax / bx   (dx - remainder)
+
+        push    dx              ; store remainder.
+        mov     dx, ax
+        cmp     dx, 0
+        jns     not_sig2
+        neg     dx
+not_sig2:
+        add     dl, 30h         ; convert to ascii code.
+        call    write_char      ; print dl.
+        pop     dx
+
+        jmp     next_fraction
+end_rem:
+        pop     dx
+        pop     ax
+        ret
+print_fraction  endp
+
+    print_float     proc    near
+        push    cx
+        push    dx
+
+        ; because the remainder takes the sign of divident
+        ; its sign should be inverted when divider is negative
+        ; (-) / (-) = (+)
+        ; (+) / (-) = (-)
+        cmp     bx, 0
+        jns     div_not_signed
+        neg     dx              ; make remainder positive.
+div_not_signed:
+
+        ; print_num procedure does not print the '-'
+        ; when the whole part is '0' (even if the remainder is
+        ; negative) this code fixes it:
+        cmp     ax, 0
+        jne     checked         ; ax<>0
+        cmp     dx, 0
+        jns     checked         ; ax=0 and dx>=0
+        push    dx
+        mov     dl, '-'
+        call    write_char      ; print '-'
+        pop     dx
+checked:
+
+        ; print whole part:
+        call    print_num
+
+        ; if remainder=0, then no need to print it:
+        cmp     dx, 0
+        je      done
+
+        push    dx
+        ; print dot after the number:
+        mov     dl, '.'
+        call    write_char
+        pop     dx
+
+        ; print digits after the dot:
+        mov     cx, precision
+        call    print_fraction
+done:
+        pop     dx
+        pop     cx
+        ret
+print_float     endp
+
+write_char      proc    near
+        push    ax
+        mov     ah, 02h
+        int     21h
+        pop     ax
+        ret
+write_char      endp
+
+
+
+
     get_num PROC
         func_intro
         printn ''
@@ -165,6 +268,7 @@ ENDM
         cmp ax,0
         jne not_done
         mov [_flag],0      ; a[i][j] == 0
+        printn 'No Answer'
         jmp delete_matrix
         not_done:
         mov [_jj],0
@@ -392,20 +496,35 @@ ENDM
 
 
         print_matrix:
-        printn ''
-        mov ax,[_2n2]
-        mov cx,2
-        mul cx
-        mov cx,ax
-        mov dx,0
+        mov [_i],0
+
+        loop_i_print:
+        mov ax,[_n]
+        mov [_j],ax
+
+        loop_j_print:
+        call get_a_index
+        mov dx,[_sia]
         mov si,dx
-        loop_print_matrix:
-
-
         mov ax,word ptr -2[bp][si]
-        call print_num
-        sub si,2
-        loop loop_print_matrix
+        call get_b_index
+        mov dx,[_sib]
+        mov si,dx
+        mov bx,word ptr -2[bp][si]
+        cwd
+        idiv bx
+        printn ''
+        call print_float
+
+
+        add [_j],1
+        mov ax,[_2n]
+        cmp [_j],ax
+        jl loop_j_print
+        mov ax,[_n]
+        add [_i],1
+        cmp [_i],ax
+        jl loop_i_print
 
 
 
