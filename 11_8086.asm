@@ -1,6 +1,27 @@
 include 'emu8086.inc'
 
-org 100h      
+stackseg segment STACK 'STACK'
+  db 100 dup(?)
+stackseg ends
+
+dataseg segment
+  s db 100 dup(0)
+  le db 0
+  ri db 0
+  sz db 0
+dataseg ends  
+
+codeseg segment
+    
+assume ss:stackseg, cs:codeseg, ds:dataseg
+
+start:
+mov ax, dataseg
+mov ds, ax
+
+call pthis
+db 'enter input string: ',0
+
 lea di,s
 mov dx,100
 call get_string
@@ -30,11 +51,6 @@ lop:
     jz chk
   pass_:
   dec bx
-  
-  ;mov ax,bx
-  ;call print_num
-  ;call pthis
-  ;db 13,10,0
   
   mov al,bl
   add al,bl
@@ -81,11 +97,6 @@ lop2:
   pass_2:
   dec bx
   
-  ;mov ax,bx
-  ;call print_num
-  ;call pthis
-  ;db 13,10,0
-  
   mov al,bl
   add al,bl
   add al,2
@@ -107,29 +118,22 @@ lop2:
   cmp dl,0
   jne lop2
 
-;mov ax,0
-;mov al,sz
-;call print_num   
-;call pthis
-;db 13,10,0
+call pthis
+db 'left index: ',0
+
 mov ax,0
 mov al,le
 call print_num   
 call pthis
-db ' ',0
+db ' right index: ',0
 mov al,ri
 call print_num
 call pthis
-db 13,10,0    
-    
-               
-ret
-        
-n db 0
-le db 0
-ri db 0
-sz db 0
-s db 100dup(0)
+db 13,10,0
+
+mov ah,4CH  ; DOS: terminate program
+mov al,0    ; return code will be 0
+int 21H     ; terminate the program 
 
 DEFINE_SCAN_NUM; get number in cx
 DEFINE_PRINT_NUM; print number in ax
@@ -137,8 +141,8 @@ DEFINE_PRINT_NUM_UNS
 DEFINE_PRINT_STRING;address in si
 DEFINE_GET_STRING;address in di , size dx
 DEFINE_PTHIS; call pthis; db 13,10,0
-end
 
-
+codeseg ends
+end start
 
 
