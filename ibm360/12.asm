@@ -1,4 +1,4 @@
-Sum start 0
+Recursive start 0
                         ; START OF INIT
 STM R14, R12, 12(R13)
 BALR R12, R0
@@ -62,7 +62,7 @@ LM R14, R12, 12(R13)
 BR R14
                         ; END OF EXIT
                         ; START OF DATA
-n   DS  F'5'
+n   DC  F'5'
 result  DS F
 error_message DS C'OK', 40 C' '
 
