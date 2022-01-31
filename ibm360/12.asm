@@ -8,6 +8,8 @@ LA R13, RegSaveArea
                         ; END OF INIT
                         ; START OF FUNCTION
 L R3, n     ;  put R3 in n
+C R3, =F'2'
+BL  EXIT_NVALID
 LA  R7, stack_array    ; R7 is stack pointer
 
 LOOP:
