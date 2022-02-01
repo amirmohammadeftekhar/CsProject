@@ -86,7 +86,6 @@ int read_expr() {
 
 
 int main() {
-    cout << int('/') << endl;
     try {
         get();
         cout << read_expr() << "\n";
