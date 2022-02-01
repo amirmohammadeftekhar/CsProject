@@ -1,4 +1,4 @@
-    BaseChange start 0
+BaseChange start 0
                             ; START OF INIT
     STM R14, R12, 12(R13)
     BALR R12, R0
@@ -119,106 +119,6 @@
         XR  R4, R4
         D   R4, a_base  ; divide R5 / a_base, reminder is in R4
 
-        ; C   R4, =F'0'
-        ; BE  WCASE0
-        ; C   R4, =F'1'
-        ; BE  WCASE1
-        ; C   R4, =F'2'
-        ; BE  WCASE2
-        ; C   R4, =F'3'
-        ; BE  WCASE3
-        ; C   R4, =F'4'
-        ; BE  WCASE4
-        ; C   R4, =F'5'
-        ; BE  WCASE5
-        ; C   R4, =F'6'
-        ; BE  WCASE6
-        ; C   R4, =F'7'
-        ; BE  WCASE7
-        ; C   R4, =F'8'
-        ; BE  WCASE8
-        ; C   R4, =F'9'
-        ; BE  WCASE9
-        ; C   R4, =F'10'
-        ; BE  WCASEA
-        ; C   R4, =F'11'
-        ; BE  WCASEB
-        ; C   R4, =F'12'
-        ; BE  WCASEC
-        ; C   R4, =F'13'
-        ; BE  WCASED
-        ; C   R4, =F'14'
-        ; BE  WCASEE
-        ; C   R4, =F'15'
-        ; BE  WCASEF
-
-        ; B   EXIT_OVERFLOW
-
-        ; WCASE0:
-        ; IC R9, =C'0'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASE1:
-        ; IC R9, =C'1'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASE2:
-        ; IC R9, =C'2'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASE3:
-        ; IC R9, =C'3'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASE4:
-        ; IC R9, =C'4'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASE5:
-        ; IC R9, =C'5'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASE6:
-        ; IC R9, =C'6'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASE7:
-        ; IC R9, =C'7'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASE8:
-        ; IC R9, =C'8'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASE9:
-        ; IC R9, =C'9'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASEA:
-        ; IC R9, =C'A'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASEB:
-        ; IC R9, =C'B'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASEC:
-        ; IC R9, =C'C'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASED:
-        ; IC R9, =C'D'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASEE:
-        ; IC R9, =C'E'
-        ; STC R9, 0(R2)
-        ; B DOWN
-        ; WCASEF:
-        ; IC R9, =C'F'
-        ; STC R9, 0(R2)
-        ; B DOWN
-
         NR R3, R3
         BZ DOWN
 
@@ -235,9 +135,6 @@
         X  R3, =F'1'
         B   LOOP_WRITE
     END_LOOP_WRITE:
-
-    XR R2,R2 ; fill ans
-
                             ; END OF FUNCTION
                             ; START OF EXIT
     B EXIT
@@ -264,8 +161,7 @@
     number   DC  C'12815$'
     b_base   DC  F'10'
     a_base   DC  F'16'
-    ; result   DS  C'0', 31 C' ' ; to handle case that input is 0
-    result   DS   2 F'0' ; remove this for string
+    result   DS   2 F'0'
 
     error_message DS C'OK', 40 C' '
 
