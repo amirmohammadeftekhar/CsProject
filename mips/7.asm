@@ -35,11 +35,55 @@ main:
     li $a1,100
     li $v0,8
     syscall
+    li $t6,10
+    li $t1,1
+    
+    li $a1,32
+    li $a2,91
+    li $a0,0
+    lower_x:
+        li $t0,0
+        lb $t0,x($a0)
+        bgt $t0,$a2,dont_x
+        add $t0,$t0,$a1
+        sb $t0,x($a0)
+        dont_x:
+        add $a0,$a0,$t1
+        li $t0,0
+        lb $t0,x($a0)
+        bne $t0,$t6,lower_x
+    
+    li $a0,0
+    lower_a:
+        li $t0,0
+        lb $t0,a($a0)
+        bgt $t0,$a2,dont_a
+        add $t0,$t0,$a1
+        sb $t0,a($a0)
+        dont_a:
+        add $a0,$a0,$t1
+        li $t0,0
+        lb $t0,a($a0)
+        bne $t0,$t6,lower_a
+    
+    li $a0,0
+    lower_b:
+        li $t0,0
+        lb $t0,b($a0)
+        bgt $t0,$a2,dont_b
+        add $t0,$t0,$a1
+        sb $t0,b($a0)
+        dont_b:
+        add $a0,$a0,$t1
+        li $t0,0
+        lb $t0,b($a0)
+        bne $t0,$t6,lower_b
+    
+        
     
     li $t0,0
     li $a0,0
-    li $t1,1
-    li $t6,10
+    
     lop:
         li $a1,0
         chk:
@@ -97,4 +141,3 @@ main:
     la $a0,ans
     li $v0,4
     syscall
-    
