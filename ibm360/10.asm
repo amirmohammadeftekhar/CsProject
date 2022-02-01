@@ -5,7 +5,8 @@ using *, R12							; declaration of R12 as the base register
 ST R13,SAVEAREA_4
 LA R13,SAVEAREA
 
-	
+FIND_X_ANSWER:
+
 	LA		R10,arr
 	LA 		R5,0
 LOOP_1_X:
@@ -50,16 +51,63 @@ LOOSE_X:
 	BL		LOOP_1_X
 
 
+FIND_Y_ANSWER:
 
-	
-	
+	LA		R10,arr
+	LA 		R5,0
+LOOP_1_Y:
+	LA		R6,0
+	LA		R11,0
+LOOP_2_Y:
+	LR		R1,R5
+    	L 		R15,=V(GET)
+    	BALR 		R14,R15
+	LR		R7,R2
+	LR		R8,R3
+	LR		R9,R4
+	LR		R1,R6
+	L 		R15,=V(GET)
+    	BALR 		R14,R15
+	CR		R3,R8
+	BL		LESS_Y
+	BH		HIGH_Y
+	LA		R11,1(R11)
+	B		CONTINUE_Y
+LESS_Y:
+	C		R4,=F'0'
+	BNE		CONTINUE_Y
+	LA		R11,1(R11)
+	B		CONTINUE_Y
+HIGH_Y:
+	C		R4,=F'1'
+	BNE		CONTINUE_Y
+	LA		R11,1(R11)
+	B		CONTINUE_Y
+CONTINUE_Y:
+	LA		R6,1(R6)
+	C		R6,N_INPUT
+	BL		LOOP_2_Y
+	C		R11,X_BEST
+	BL		LOOSE_Y
+	ST		R11,Y_BEST
+	ST		R8,Y_ANS
+LOOSE_Y:
+	LA		R5,1(R5)
+	C		R5,N_INPUT
+	BL		LOOP_1_Y
+
+
+
+
+
+
 
 
 L  R13,SAVEAREA_4
 LM R14,R12,12(R13)
 BR R14
 
-N_INPUT 		DC F'2'
+N_INPUT 		DC F'3'
 Y_BEST		DC F'-100'
 Y_ANS		DS F
 X_BEST		DC F'-100'
@@ -67,7 +115,7 @@ X_ANS		DS F
 XY_BEST		DC F'-100'
 XY_X_ANS		DS F
 XY_Y_ANS		DS F
-arr		DC F'0',F'0',F'1',F'6',F'6',F'0'
+arr		DC F'0',F'0',F'0',F'2',F'2',F'1',,F'6',F'6',F'1'
 
 SAVEAREA  	DS F
 SAVEAREA_4	DS 17F
@@ -92,7 +140,7 @@ GET	START		0
 
 
 
-	
+
 OUT:
 
 L  	R13,SAVEAREA_4(R8)
@@ -107,7 +155,6 @@ SAVEAREA		DS	F
 SAVEAREA_4	DS	719F
 
 end
-
 
 
 
