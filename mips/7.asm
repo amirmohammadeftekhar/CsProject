@@ -141,3 +141,6 @@ main:
     la $a0,ans
     li $v0,4
     syscall
+    
+    li $v0,10
+    syscall
