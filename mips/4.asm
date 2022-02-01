@@ -118,6 +118,7 @@
 #   s0  current char
 #   f0  result of last function call
 #   set f10 to be 10 float
+#   set f2 to be 0
 
 start_init:
     la $sp, stack
@@ -126,6 +127,10 @@ start_init:
     li $t0, 10
     mtc1 $t0, $f10
     cvt.s.w  $f10, $f10  # f0 is float 10
+
+    li $t0, 0
+    mtc1 $t0, $f2
+    cvt.s.w  $f2, $f2  # f0 is float 10
 end_init:
 j start_prog
 
@@ -195,6 +200,10 @@ read_md:
         pushf($f0)
         call(read_cr)
         popf($f1)
+        mov.s $f3, $f0
+        abs.s $f3, $f3   # absolute value
+        c.le.s $f3, $f2
+        bc1t exit_divide_by_zero    # check division by zero
         div.s $f0, $f1, $f0
         j read_md_loop
 
