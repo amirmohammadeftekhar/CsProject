@@ -3,7 +3,12 @@
 
 
 main:
-	li $s4, 10
+	la $a0, dim_input
+	li $v0, 4
+	syscall
+	li $v0, 5
+	syscall
+	move $s4, $v0		# $s4 = n
 	move $a0, $s4
 	mult $a0, $a0
 	mflo $a0
@@ -13,8 +18,81 @@ main:
 	syscall
 	sw $v0, mat
 
+	la $a0, mat_input
+	li $v0, 4
+	syscall
+	move $t0, $0		# $t0 = i
+	sll $s0, $s4, 2
+	lw $s1, mat
+	take_input_out:
+		slt $t2, $t0, $s0
+		beqz $t2, end_take_input_out
+		move $t1, $0		# $t1 = j
+		take_input_in:
+			slt $t2, $t1, $s0
+			beqz $t2, end_take_input_in
+
+			mult $s4, $t0
+			mflo $t3
+			sll $t3, $t3, 1
+			add $t3, $t3, $t1
+			add $t3, $t3, $s1
+
+			li $v0, 6
+			syscall
+			s.s $f0, 0($t3)
+
+			addi $t1, $t1, 4
+			j take_input_in
+		end_take_input_in:
+		addi $t0, $t0, 4
+		j take_input_out
+	end_take_input_out:
+
 	move $a0, $s4
 	jal solve
+
+
+
+	move $t0, $0		# $t0 = i
+	sll $s0, $s4, 2
+	lw $s1, mat
+	print_out:
+		slt $t2, $t0, $s0
+		beqz $t2, end_print_out
+		move $t1, $0		# $t1 = j
+		print_in:
+			slt $t2, $t1, $s0
+			beqz $t2, end_print_in
+
+			mult $s4, $t0
+			mflo $t3
+			sll $t3, $t3, 1
+			add $t3, $t3, $t1
+			add $t3, $t3, $s1
+			add $t3, $t3, $s0
+
+			li $v0, 2
+			l.s $f12, 0($t3)
+			syscall
+
+
+			li $v0, 4
+			la $a0, space
+			syscall
+
+			addi $t1, $t1, 4
+			j print_in
+		end_print_in:
+		li $v0, 4
+		la $a0, newline
+		syscall
+		addi $t0, $t0, 4
+		j print_out
+	end_print_out:
+
+
+
 
 	li $v0, 10
 	syscall
@@ -23,9 +101,11 @@ main:
 
 solve:
 
-	addi $sp, $sp, -8
+	addi $sp, $sp, -16
 	sw $ra, 0($sp)			# storing $ra for returning to the caller
 	sw $a0, 4($sp)			# storing values which store return values of F and are overwritten in the function
+	sw $s0, 8($sp)
+	sw $s4, 12($sp)
 
 	# $a0 = n
 	sll $s0, $a0, 2
@@ -45,6 +125,7 @@ solve:
 			cvt.s.w $f0, $f0		# $f0 = (i == j)
 			mult $t0, $a0
 			mflo $t3
+			sll $t3, $t3, 1
 			add $t3, $t3, $t1
 			add $t3, $t3, $s0
 			add $t3, $t3, $s2
@@ -66,6 +147,7 @@ solve:
 		beqz $t2, end_loop_2_out
 		mult $t0, $a0
 		mflo $t3
+		sll $t3, $t3, 1
 		add $t3, $t3, $t0
 		add $t3, $t3, $s2
 		l.s $f0, 0($t3)		# $f0 = a[i][i]
@@ -79,6 +161,7 @@ solve:
 			beq $t0, $t1, skip
 			mult $t1,$a0
 			mflo $t3
+			sll $t3, $t3, 1
 			add $t3, $t3, $t0
 			add $t3, $t3, $s2
 			l.s $f1, 0($t3)
@@ -90,12 +173,14 @@ solve:
 				beqz $t2, end_loop_2_deep
 				mult $t0,$a0
 				mflo $t3
+				sll $t3, $t3, 1
 				add $t3, $t3, $t4
 				add $t3, $t3, $s2
 				l.s $f3, 0($t3)		# $f3 = a[i][k]
 				mul.s $f4, $f2, $f3	# $f4 = ratio * a[i][k]
 				mult $t1,$a0
 				mflo $t3
+				sll $t3, $t3, 1
 				add $t3, $t3, $t4
 				add $t3, $t3, $s2
 				l.s $f3, 0($t3)		# $f3 = a[j][k]
@@ -124,6 +209,7 @@ solve:
 
 		mult $t0, $a0
 		mflo $t3
+		sll $t3, $t3, 1
 		add $t3, $t3, $t0
 		add $t3, $t3, $s2
 		l.s $f0, 0($t3)		# $f0 = a[i][i]
@@ -135,6 +221,7 @@ solve:
 
 			mult $t0, $a0
 			mflo $t3
+			sll $t3, $t3, 1
 			add $t3, $t3, $t1
 			add $t3, $t3, $s2
 			l.s $f1, 0($t3)		# $f1 = a[i][j]
@@ -157,7 +244,9 @@ solve:
 	return:
 		lw $ra, 0($sp)
 		lw $a0, 4($sp)
-		addi $sp, $sp, 8
+		lw $s0, 8($sp)
+		lw $s4, 12($sp)
+		addi $sp, $sp, 16
 		jr $ra
 
 
@@ -165,7 +254,12 @@ solve:
 
 .data
 
-mat: .word 0
-rt: .word 0
+	mat: .word 0
+
+	newline: .asciiz "\n"
+	space: .asciiz " "
+	dim_input: .asciiz "Please enter dimension of the matrix: "
+	mat_input: .asciiz "Please enter the matrix entries:\n"
+	inv_mat: .asciiz "The matrix inverse is:\n"
 
 
