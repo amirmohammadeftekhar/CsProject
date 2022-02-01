@@ -1,4 +1,4 @@
-# ComputerStructureProject
+# Computer Structure Project
 
 ### This repository contains solutions to 12 assembly tasks, coded in three machines (8086, IBM 360, MIPS).
 
