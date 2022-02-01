@@ -45,6 +45,51 @@ call get_string
 call pthis
 db 13,10,0
 
+mov dx,32
+mov di,0
+lop_x:
+  mov cl,x[di]
+  mov ch,91
+  cmp cl,ch
+  jge dont_x
+  add cl,dl
+  mov x[di],cl
+  dont_x:
+  inc di
+  mov cl,x[di]
+  cmp cl,0
+  jnz lop_x
+  
+mov dx,32
+mov di,0
+lop_a:
+  mov cl,a[di]
+  mov ch,91
+  cmp cl,ch
+  jge dont_a
+  add cl,dl
+  mov a[di],cl
+  dont_a:
+  inc di
+  mov cl,a[di]
+  cmp cl,0
+  jnz lop_a
+
+mov dx,32
+mov di,0
+lop_b:
+  mov cl,b[di]
+  mov ch,91
+  cmp cl,ch
+  jge dont_b
+  add cl,dl
+  mov b[di],cl
+  dont_b:
+  inc di
+  mov cl,b[di]
+  cmp cl,0
+  jnz lop_b
+
 mov di,0
 lop1:
   call check
