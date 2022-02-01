@@ -6,6 +6,6 @@
 
 ## Authors:
 * Kamyar Kazari
-* Ali Pasha Montaseri
+* Alipasha Montaseri
 * Amir Mohammad Eftekhar
 * Shayan Pardis
