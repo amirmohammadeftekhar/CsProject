@@ -91,6 +91,10 @@ main:
     lw $a0,ri
     li $v0,1
     syscall
+	
+	
+	li $v0,10
+    syscall
     
         
             
