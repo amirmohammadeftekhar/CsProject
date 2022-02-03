@@ -9,6 +9,3 @@
 * Alipasha Montaseri
 * Amir Mohammad Eftekhar
 * Shayan Pardis
-
-Repository link:
-https://github.com/Kalam132/ComputerStructureProject
